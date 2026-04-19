@@ -12,16 +12,14 @@ services:
       - "139:139" 
       - "446:445"
 
-#     networks:
-#       integrated:
-#         interface_name: int0
-#         aliases:
-#           - samba
-#           - file-srv
-#         ipv4_address: 192.168.2.9
-#         ipv6_address: 'fd2a:89e6:4e8f::daad:f17e'
-#         mac_address: '22:E6:48:9D:CC:77'
+    networks:
+      integrated:
+        interface_name: int0
+        
+        ipv4_address: 192.168.2.9
+        ipv6_address: 'fd2a:89e6:4e8f::daad:f17e'
+        mac_address: '22:E6:48:9D:CC:77'
 
-# networks:
-#   integrated:
-#     external: true
+networks:
+  integrated:
+    external: true
