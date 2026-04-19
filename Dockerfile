@@ -20,4 +20,4 @@ RUN chmod +x /entry.sh
 EXPOSE 137/udp 139 445
 
 ENTRYPOINT [ "/entry.sh" ]
-CMD ["tail", "-f", "/dev/null" ]
+CMD ["/usr/sbin/smbd", "-F", "-S", "-D", "-d", "10"]

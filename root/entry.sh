@@ -8,8 +8,8 @@ echo "nobodyPassword\nnobodyPassword" | passwd smbusr
 echo "nobodyPassword\nnobodyPassword" | smbpasswd smbusr
 
 sleep 2
-echo "[Entry] Starting exec samba"
-exec smbd -d 10 --debug-stdout &
+# echo "[Entry] Starting exec samba"
+# exec smbd -d 10 --debug-stdout &
 
 
 echo "[Entry] Starting exec nmbd"
