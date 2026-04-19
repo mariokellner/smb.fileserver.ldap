@@ -14,7 +14,6 @@ RUN apt-get update && \
     mkdir -p /external/avahi && \
     touch /external/avahi/not-mounted 
 
-USER daemon
 COPY root /
 
 EXPOSE 137/udp 139 445
