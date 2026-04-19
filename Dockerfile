@@ -15,6 +15,7 @@ RUN apt-get update && \
     touch /external/avahi/not-mounted 
 
 COPY root /
+RUN chmod +x /entry.sh
 
 EXPOSE 137/udp 139 445
 
