@@ -1,8 +1,18 @@
 services:
   samba_authentik:
-    build: .
+    build: 
+      context: .
+      no_cache_filter: configure
     container_name: samba_authentik
-    restart: always
+    restart: no
+
+    volumes:
+      - privdb:/var/lib/samba/private:rw
+      - logdb:/var/log:rw
+      - ./root/etc/samba/smb.conf:/etc/samba/smb.conf:rw
+      - pblic:/myshares/public:rw
+      - homes:/homes:rw
+      - dms:/myshares/paperless:rw
 
     cap_add:
       - CAP_NET_ADMIN
@@ -12,14 +22,21 @@ services:
       - "139:139" 
       - "446:445"
 
-    networks:
-      integrated:
-        interface_name: int0
+#     networks:
+#       integrated:
+#         #interface_name: int0
 
-        ipv4_address: 192.168.2.9
-        ipv6_address: 'fd2a:89e6:4e8f::daad:f17e'
-        mac_address: '22:E6:48:9D:CC:77'
+#         ipv4_address: 192.168.2.9
+#         ipv6_address: 'fd2a:89e6:4e8f::daad:f17e'
+#         mac_address: '22:E6:48:9D:CC:77'
 
-networks:
-  integrated:
-    external: true
+# networks:
+#   integrated:
+#     external: true
+
+volumes:
+  privdb:
+  logdb:
+  dms:
+  homes:
+  pblic:
