@@ -1,11 +1,7 @@
-FROM bitnami/minideb AS builder
+FROM debian:bookworm-slim AS builder
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends --no-install-suggests -y samba libnss-mdns \
-    libnss-ldapd ldap-utils libpam-ldapd \ 
-    krb5-user avahi-daemon wsdd2 \
-    # tzdata runit \
-    && \
+    apt-get install --no-install-recommends --no-install-suggests -y samba libnss-mdns libnss-ldapd ldap-utils libpam-ldapd avahi-daemon samba-vfs-modules wsdd2 && \ 
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt && \
     rm -rf /etc/samba/smb.conf /var/lib/samba/private/secrets.tdb /etc/smbldap-tools /etc/nslcd.conf /etc/nsswitch.conf && \
@@ -20,12 +16,7 @@ FROM builder AS configure
 # with that i can use no-cache-filter
 
 COPY root /
-RUN chmod +x /entry.sh && \
-    chmod +x /createUserDirs.sh && \
-    chmod 600 /etc/nslcd.conf && \
-    chmod 600 /etc/nsswitch.conf
-
-EXPOSE 137/udp 139 445
+RUN chmod +x /entry.sh && chmod +x /createUserDirs.sh && chmod 600 /etc/nslcd.conf && chmod 600 /etc/nsswitch.conf
 
 ENTRYPOINT [ "/entry.sh" ]
 # TODO (mario): kein tail -f nutzen

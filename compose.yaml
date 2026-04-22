@@ -9,7 +9,6 @@ services:
     volumes:
       - privdb:/var/lib/samba/private:rw
       - logdb:/var/log:rw
-      - ./root/etc/samba/smb.conf:/etc/samba/smb.conf:rw
       - pblic:/myshares/public:rw
       - homes:/homes:rw
       - dms:/myshares/paperless:rw
@@ -22,6 +21,11 @@ services:
       - "139:139" 
       - "446:445"
 
+    environment:
+      - LDAP_AK_URI=${LDAP_AK_URI:-ldap://host.docker.internal:3489}
+      - LDAP_BASE_DN=${LDAP_BASE_DN:-testpw}
+      - LDAP_ADMIN_DN_USERCN=${LDAP_ADMIN_DN_USERCN:-testpw}
+      - LDAP_ADMIN_DN_PASSWORD=${LDAP_ADMIN_DN_PASSWORD:-testpw}
 #     networks:
 #       integrated:
 #         #interface_name: int0
