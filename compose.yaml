@@ -7,12 +7,11 @@ services:
     restart: no
 
     volumes:
-      - privdb:/var/lib/samba/private:rw
+      - samba:/var/lib/samba/:rw
       - logdb:/var/log:rw
       - pblic:/myshares/public:rw
       - homes:/homes:rw
       - dms:/myshares/paperless:rw
-
     cap_add:
       - CAP_NET_ADMIN
 
@@ -39,7 +38,7 @@ services:
 #     external: true
 
 volumes:
-  privdb:
+  samba:
   logdb:
   dms:
   homes:

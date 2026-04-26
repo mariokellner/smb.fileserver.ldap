@@ -1,5 +1,7 @@
 #!/bin/sh
-# docker-entrypoint.sh
+
+rm -rf /var/run/* 2>/dev/null >/dev/null
+mkdir /run/samba /var/run/samba
 
 # Defaults
 DEF_LDAP_AK_URI="ldap://localhost"
@@ -43,21 +45,5 @@ sed -i 's$dc=example,dc=org$'"$DEF_LDAP_BASE_DN"'$g' /etc/nslcd.conf
 sed -i 's$bindpw testpw$'"bindpw $LDAP_ADMIN_DN_PASSWORD"'$g' /etc/nslcd.conf
 sed -i 's$binddn cn=user$'"binddn cn=$DEF_LDAP_ADMIN_DN_USERCN"'$g' /etc/nslcd.conf
 
-
-
-## Service
-echo "[Entry] Starting exec nmbd"
-exec nmbd &
-
-echo "[Entry] Starting avahi-daemon"
-exec avahi-daemon --no-rlimits &
-
-echo "[Entry] Starting nslcd"
-exec nslcd &
-
-echo "[Entry] Starting exec samba"
-exec smbd --foreground --no-process-group --debug-stdout -d 3 &
-
-echo "[ENTRY] Starting CMD"
-echo "$@"
+echo "[ENTRY] Starting CMD => $@"
 exec "$@"
