@@ -1,17 +1,12 @@
 #!/bin/sh
 set -e
 
-BASE="$1"
-USER="$2"
-
-echo ">> create $BASE/$USER"
-
-USER_INFO=$(getent passwd "$USER") || exit 1
+USER_INFO=$(getent passwd "$2") || exit 1
 
 UID=$(echo "$USER_INFO" | cut -d: -f3)
 GID=$(echo "$USER_INFO" | cut -d: -f4)
 
-HOME_DIR="$BASE/$USER"
+HOME_DIR="$1/$2"
 
 if [ ! -d "$HOME_DIR" ]; then
   mkdir -p "$HOME_DIR"

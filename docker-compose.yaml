@@ -1,0 +1,52 @@
+services:
+  samba_authentik:
+    build: 
+      context: .
+      no_cache_filter: configure
+    container_name: samba_authentik
+    restart: no
+    
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    volumes:
+      - samba:/var/lib/samba/:rw
+      - logdb:/var/log:rw
+      - pblic:/mnt/public:rw
+      - homes:/mnt/homes:rw
+      - dms:/mnt/paperless:rw
+      - ./smb.conf:/etc/samba/conf.d/smb.user.conf:ro
+
+    cap_add:
+      - CAP_NET_ADMIN
+
+    ports:
+      - 137:137/udp
+      - 139:139
+      - 446:445
+      - 3702:3702/udp
+      - 3702:3702/tcp
+      - 5354:5353/udp
+      - 5354:5353/tcp
+      - 5355:5355/udp
+      - 5355:3555/tcp
+
+    env_file:
+      - .env
+
+    environment:
+      LDAP_AK_URI: ${LDAP_AK_URI}
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+      LDAP_ADMIN_DN_USERCN: ${LDAP_ADMIN_DN_USERCN}
+      LDAP_ADMIN_DN_PASSWORD: ${LDAP_ADMIN_DN_PASSWORD}
+      
+      SMBSHARE_GUEST_USERNAME: ${SMBSHARE_GUEST_USERNAME}
+      
+volumes:
+  samba:
+  logdb:
+  dms:
+  homes:
+  pblic:

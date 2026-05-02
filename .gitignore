@@ -1,3 +1,5 @@
 .git
 .env
 .vscode
+smb.user.conf
+docker-compose.override.yaml
