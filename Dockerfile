@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim AS builder
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends --no-install-suggests -y supervisor samba libnss-ldapd libpam-ldapd avahi-daemon samba-vfs-modules wsdd2 && \ 
+    apt-get install --no-install-recommends --no-install-suggests -y supervisor samba libnss-ldapd libnss-mdns libpam-ldapd avahi-daemon samba-vfs-modules wsdd2 && \ 
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt && \
     rm -rf /etc/samba/smb.conf /var/lib/samba/private/secrets.tdb /etc/smbldap-tools /etc/nslcd.conf /etc/nsswitch.conf && \

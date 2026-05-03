@@ -41,13 +41,6 @@ EOF
 
 echo "${T}Preparing container environment"
 
-if [ -f "$IF" ]; then
-    echo "${T}Container was already setup. Skipping setup."
-    echo "${ET}Starting CMD => $@"
-    exec "$@"
-    exit
-fi
-
 # Initialization
 sed -i '/<\/service-group>/d' $AVSMBS
 
@@ -205,11 +198,29 @@ filter passwd $DEF_LDAP_ACCESS_FILTER_USER
 
 EOF
 
-if [ ! -z $SMBSHARE_GUEST_USERNAME ]; then    
+if [ ! -z $SHARENAME ]; then
+    cat <<EOF >> /etc/samba/conf.d/smb.base.conf
+  netbios name = $SHARENAME
+  additional dns hostnames =  $SHARENAME
+  
+EOF
+    sed -i "s/command=wsdd2/command=wsdd2 -H $SHARENAME/g" /etc/supervisor.conf
+    sed -i "s/#host-name=.*/host-name=$SHARENAME/g" /etc/avahi/avahi-daemon.conf
+fi
+
+if [ ! -z $WORKGROUP ]; then
+    cat <<EOF >> /etc/samba/conf.d/smb.base.conf
+        
+  workgroup = $WORKGROUP
+
+EOF
+fi
+
+if [ ! -z $GUEST_USERNAME ]; then    
     cat <<EOF >> /etc/samba/conf.d/smb.base.conf
 
       # GUEST 
-      guest account = $SMBSHARE_GUEST_USERNAME
+      guest account = $GUEST_USERNAME
       map to guest = Bad User
       
       # this is a service option but testparm returns it as a valid option for global section too.  
@@ -222,5 +233,9 @@ fi
 
 smbpasswd -w $DEF_LDAP_ADMIN_DN_PASSWORD
 
-echo "${ET}Starting CMD => $@"
+# cat "${BASEC}"
+echo "${T} ======= Final conf ======="
+testparm -s
+echo  "${T} ===== Final  End ====="
+echo "\\${ET}Starting CMD => $@"
 exec "$@"
