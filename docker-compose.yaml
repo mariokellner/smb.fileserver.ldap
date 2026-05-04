@@ -7,7 +7,7 @@ services:
       context: .
       no_cache_filter: configure
       tags:
-        - mario23232/mariokellner:smb.fileserver.ldap-latest # hack vor single private docker repo
+        - git.homelab.kellner-digital.com/mario/smb.fileserver.ldap:latest # homelab gitea repo
 
     restart: no
     
