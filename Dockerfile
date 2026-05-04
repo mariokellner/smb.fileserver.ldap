@@ -10,14 +10,12 @@ RUN apt-get update && \
     mkdir -p /external/avahi && \
     touch /external/avahi/not-mounted
 
-
 FROM builder AS configure
-
-EXPOSE 137/udp 139 445 3702/udp 3702/tcp 5355/udp 5353/udp 5355/tcp
 
 COPY root /
 RUN chmod +x /*.sh && chmod 600 /etc/nslcd.conf && chmod 600 /etc/nsswitch.conf
 
-ENTRYPOINT [ "/entry.sh" ]
 HEALTHCHECK CMD [ "/health.sh" ]
+ENTRYPOINT [ "/entry.sh" ]
 CMD ["supervisord", "-c", "/etc/supervisor.conf", "-n"]
+EXPOSE 137/udp 139/tcp 445/tcp 3702/udp 3702/tcp 5355/udp 5355/tcp 5353/udp 5353/tcp

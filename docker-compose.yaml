@@ -1,9 +1,14 @@
 services:
-  samba_authentik:
+  smbFileserverLDAP:
+    image: smb.fileserver.ldap:latest
+    container_name: smbFileserverLDAP
+
     build: 
       context: .
       no_cache_filter: configure
-    container_name: samba_authentik
+      tags:
+        - mario23232/mariokellner:smb.fileserver.ldap-latest # hack vor single private docker repo
+
     restart: no
     
     ulimits:
@@ -13,11 +18,13 @@ services:
 
     cap_add:
       - CAP_NET_ADMIN
+    
+    network_mode: host
 
     ports:
       - 137:137/udp
-      - 139:139
-      - 445:445
+      - 139:139/tcp
+      - 445:445/tcp
       #- 446:445
       - 3702:3702/udp
       - 3702:3702/tcp
@@ -26,11 +33,20 @@ services:
       - 5355:5355/udp
       - 5355:3555/tcp
 
-    env_file:
-      - .env
-
     environment:
       LDAP_AK_URI: ${LDAP_AK_URI}
       LDAP_BASE_DN: ${LDAP_BASE_DN}
       LDAP_ADMIN_DN_USERCN: ${LDAP_ADMIN_DN_USERCN}
       LDAP_ADMIN_DN_PASSWORD: ${LDAP_ADMIN_DN_PASSWORD}
+
+    labels:
+      org.opencontainers.image.authors: "Mario Kellner"
+      org.opencontainers.image.source: "https://git.homelab.kellner-digital.com/mario/samba_fileserver"
+      org.opencontainers.image.description: "This Container is meant to be used with LDAP Provider MOD to enable authentication from authentik instead of relaying on local users.\n It uses ldapsam+nslcd (pam) to sync the accounts from authentik and uses it as source."
+      org.opencontainers.image.documentation: "https://docs.goauthentik.io"
+      org.opencontainers.image.licenses: "https://git.homelab.kellner-digital.com/mario/samba_fileserver/src/branch/main/LICENSE"
+      org.opencontainers.image.revision: "0.0.1"
+      org.opencontainers.image.title: "Samba LDAP For Authentik"
+      org.opencontainers.image.url: "https://www.kellner-digital.com"
+      org.opencontainers.image.vendor: "Mario Kellner"
+      org.opencontainers.image.version: "0.0.1"
