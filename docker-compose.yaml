@@ -1,6 +1,6 @@
 services:
   smbFileserverLDAP:
-    image: smb.fileserver.ldap:latest
+    image: smb.fileserver.ldap
     container_name: smbFileserverLDAP
 
     build: 
