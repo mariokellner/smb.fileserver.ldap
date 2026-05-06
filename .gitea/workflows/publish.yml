@@ -13,12 +13,7 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      packages: write
-      contents: read
-      attestations: write
-      artifact-metadata: write
+
     env:
       REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
       IMAGE_NAME: ${{ github.repository }}
@@ -40,6 +35,22 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMG_PATH }}
+          
+          tags: |
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+          labels: |
+            org.opencontainers.image.authors="Mario Kellner"
+            org.opencontainers.image.source="https://git.homelab.kellner-digital.com/mario/samba_fileserver"
+            org.opencontainers.image.description="This Container is meant to be used with LDAP Provider MOD to enable authentication from authentik instead of relaying on local users.\n It uses ldapsam+nslcd (pam) to sync the accounts from authentik and uses it as source."
+            org.opencontainers.image.documentation="https://git.homelab.kellner-digital.com/mario/samba_fileserver/src/branch/main/README.md"
+            org.opencontainers.image.licenses="https://git.homelab.kellner-digital.com/mario/samba_fileserver/src/branch/main/LICENSE"
+            org.opencontainers.image.title="SMB Fileserver with LDAP Integration"
+            org.opencontainers.image.url="https://www.kellner-digital.com"
+            org.opencontainers.image.vendor="Mario Kellner"
+            org.opencontainers.image.base.name="debian:bookworm-slim"
+
 
       - name: Login to Gitea Registry
         uses: docker/login-action@v4
@@ -55,28 +66,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          sbom: true
+          provenance: mode=max
           platforms: linux/amd64,linux/arm64
 
-          tags: |
-            ${{ env.IMG_PATH }}:latest
-            ${{ env.IMG_PATH }}:${{ github.sha }}
-
-          labels: |
-            org.opencontainers.image.authors="Mario Kellner"
-            org.opencontainers.image.source="https://git.homelab.kellner-digital.com/mario/samba_fileserver"
-            org.opencontainers.image.description="This Container is meant to be used with LDAP Provider MOD to enable authentication from authentik instead of relaying on local users.\n It uses ldapsam+nslcd (pam) to sync the accounts from authentik and uses it as source."
-            org.opencontainers.image.documentation="https://localhost"
-            org.opencontainers.image.licenses="https://git.homelab.kellner-digital.com/mario/samba_fileserver/src/branch/main/LICENSE"
-            org.opencontainers.image.revision="0.0.1"
-            org.opencontainers.image.title="Samba LDAP For Authentik"
-            org.opencontainers.image.url="https://www.kellner-digital.com"
-            org.opencontainers.image.vendor="Mario Kellner"
-            org.opencontainers.image.version="0.0.1"
-
-      # - name: Attest
-      #   uses: actions/attest@v4
-      #   id: attest
-      #   with:
-      #     subject-name: ${{ env.IMG_PATH }}
-      #     subject-digest: ${{ steps.push.outputs.digest }}
-      #     push-to-registry: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
