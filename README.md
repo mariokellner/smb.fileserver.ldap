@@ -219,13 +219,13 @@ services:
 
       SMBGLOBAL_workgroup: HOMELAB
 
-      SMBSHARE_ENTRY_1_NAME: Data
-      SMBSHARE_ENTRY_1_PATH: /mnt/data
-      SMBSHARE_ENTRY_1_PUBLIC: yes
+      SMBSHARE_ENTRY_1_name: Data
+      SMBSHARE_ENTRY_1_path: /mnt/data
+      SMBSHARE_ENTRY_1_public: yes
 
-      SMBSHARE_ENTRY_2_NAME: homes
-      SMBSHARE_ENTRY_2_PATH: /mnt/homes/%U
-      SMBSHARE_ENTRY_2_HOMES: yes
+      SMBSHARE_ENTRY_2_name: User Share
+      SMBSHARE_ENTRY_2_path: /mnt/homes/%U
+      SMBSHARE_ENTRY_2_homes: yes
 
     volumes:
       - ./data:/mnt/data
