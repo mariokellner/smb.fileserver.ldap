@@ -23,7 +23,7 @@ jobs:
       REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
       IMAGE_NAME: ${{ github.repository }}
       REPO: ${{ github.actor }}
-      IMG_PATH: ${{ env.REGISTRY }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}
+      IMG_PATH: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout repository
@@ -73,10 +73,10 @@ jobs:
             org.opencontainers.image.vendor="Mario Kellner"
             org.opencontainers.image.version="0.0.1"
 
-      - name: Attest
-        uses: actions/attest@v4
-        id: attest
-        with:
-          subject-name: ${{ env.IMG_PATH }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+      # - name: Attest
+      #   uses: actions/attest@v4
+      #   id: attest
+      #   with:
+      #     subject-name: ${{ env.IMG_PATH }}
+      #     subject-digest: ${{ steps.push.outputs.digest }}
+      #     push-to-registry: true
