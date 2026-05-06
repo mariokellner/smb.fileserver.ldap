@@ -92,14 +92,14 @@ do
 
         elif [ "${CONFK}" = "public" ]; then
             if [ "${VALUE}" = "yes" ]; then
-                options=$(echo "$options\n  guest ok = yes\n  read only = no\n  writeable = yes\n available = yes")
+                options=$(echo "$options\n  guest ok = yes\n  writeable = yes\n available = yes")
             fi
             
             options=$(echo "$options\n  $CONFK = $VALUE")
 
         elif [ "${CONFK}" = "guest ok" ]; then
             if [ "${VALUE}" = "yes" ]; then
-                options=$(echo "$options\n  public = yes\n  read only = no\n  writeable = yes\n available = yes")
+                options=$(echo "$options\n  public = yes\n  writeable = yes\n available = yes")
             fi
             
             options=$(echo "$options\n  $CONFK = $VALUE")
@@ -235,13 +235,13 @@ EOF
     sed -i "s/#host-name=.*/host-name=$SHARENAME/g" $AVSMBC
 fi
 
-# shortcut to set the workgroup for all services (Actually i think all services will inerhit it from the smb.cnf, but ill leave the option here)
-if [ ! -z $WORKGROUP ]; then
-    cat <<EOF >> $BASEC
+# # shortcut to set the workgroup for all services (Actually i think all services will inerhit it from the smb.cnf, but ill leave the option here)
+# if [ ! -z $WORKGROUP ]; then
+#     cat <<EOF >> $BASEC
 
-  workgroup = $WORKGROUP
-EOF
-fi
+#   workgroup = $WORKGROUP
+# EOF
+# fi
 
 # shortcut to set guest user information to enable that anyuser could access the share
 if [ ! -z $GUEST_USERNAME ]; then    
