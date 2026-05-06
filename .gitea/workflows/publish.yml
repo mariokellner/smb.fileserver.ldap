@@ -15,14 +15,14 @@ env:
   REPO: ${{ github.actor }}
   IMG_PATH: ${{ env.REGISTRY }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}
 
-permissions:
-  id-token: write
-  attestations: write
-  artifact-metadata: write
-
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
 
     steps:
       - name: Checkout repository
