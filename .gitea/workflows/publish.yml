@@ -9,20 +9,21 @@ on:
     tags:
       - '*'
 
-env:
-  REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
-  IMAGE_NAME: smb.fileserver.ldap
-  REPO: ${{ github.actor }}
-  IMG_PATH: ${{ env.REGISTRY }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}
-
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
 
     permissions:
       id-token: write
+      packages: write
       contents: read
       attestations: write
+      artifact-metadata: write
+    env:
+      REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
+      IMAGE_NAME: ${{ github.repository }}
+      REPO: ${{ github.actor }}
+      IMG_PATH: ${{ env.REGISTRY }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout repository
@@ -59,6 +60,7 @@ jobs:
           tags: |
             ${{ env.IMG_PATH }}:latest
             ${{ env.IMG_PATH }}:${{ github.sha }}
+
           labels: |
             org.opencontainers.image.authors="Mario Kellner"
             org.opencontainers.image.source="https://git.homelab.kellner-digital.com/mario/samba_fileserver"
