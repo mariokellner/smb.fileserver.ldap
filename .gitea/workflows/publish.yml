@@ -4,10 +4,8 @@ run-name: ${{ gitea.actor }} is building and pushing container image
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'main'
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
   build-docker-image:
