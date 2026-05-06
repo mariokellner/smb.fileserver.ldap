@@ -11,9 +11,9 @@ on:
 
 env:
   REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
-  
   IMAGE_NAME: smb.fileserver.ldap
   REPO: ${{ github.actor }}
+  IMG_PATH: ${{ env.REGISTRY }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}
 
 permissions:
   id-token: write
@@ -38,7 +38,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMG_PATH }}
 
       - name: Login to Gitea Registry
         uses: docker/login-action@v4
@@ -57,8 +57,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMG_PATH }}:latest
+            ${{ env.IMG_PATH }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.authors="Mario Kellner"
             org.opencontainers.image.source="https://git.homelab.kellner-digital.com/mario/samba_fileserver"
@@ -78,8 +78,3 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-
-  publish-gitea:
-    runs-on: ubuntu-latest
-    needs: build-docker-image
-
