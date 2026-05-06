@@ -11,12 +11,11 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
 
-
     env:
       REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
-      IMAGE_NAME: ${{ github.repository }}
-      REPO: ${{ github.actor }}
-      IMG_PATH: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      IMAGE_NAME: smb.fileserver-ldap
+      NS: public
+      IMG_PATH_GITEA: ${{ env.REGISTRY }}/${{ env.NS }}/${{ env.IMAGE_NAME }}
 
     steps:
       - name: Checkout repository
@@ -32,7 +31,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMG_PATH }}
+          images: | 
+            ${{ env.IMG_PATH_GITEA }}
           
           tags: |
             type=ref,event=branch
