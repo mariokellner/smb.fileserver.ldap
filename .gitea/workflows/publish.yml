@@ -13,7 +13,7 @@ jobs:
 
     env:
       REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
-      IMAGE_NAME: smb.fileserver-ldap
+      IMAGE_NAME: smb.fileserver.ldap
       NS: public
       IMG_PATH_GITEA: ${{ env.REGISTRY }}/${{ env.NS }}/${{ env.IMAGE_NAME }}
 
@@ -41,9 +41,6 @@ jobs:
             type=raw,value=${{ github.sha }}
           labels: |
             org.opencontainers.image.authors="Mario Kellner"
-            org.opencontainers.image.source="${{ github.repositoryUrl }}"
-            org.opencontainers.image.description="This Container is meant to be used with LDAP Provider MOD to enable authentication from authentik instead of relaying on local users.\n It uses ldapsam+nslcd (pam) to sync the accounts from authentik and uses it as source."
-            org.opencontainers.image.documentation="${{ github.repositoryUrl }}"
             org.opencontainers.image.licenses="MIT"
             org.opencontainers.image.title="SMB Fileserver with LDAP Integration"
             org.opencontainers.image.url="https://www.kellner-digital.com"
