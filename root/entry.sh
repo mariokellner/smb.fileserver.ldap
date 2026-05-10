@@ -22,12 +22,11 @@ log() {
 # Constants
 INIT="/.init"
 
-
 # Defaults (not required in docker-compose)
-DEF_LDAP_USER_SUF="users"
-DEF_LDAP_GROUPS_SUF="groups"
-DEF_LDAP_ACCESS_FILTER_USER="(objectClass=user)"
-DEF_LDAP_FILTER_GROUP="(objectClass=group)"
+DEF_LDAP_USER_SUF="${LDAP_USER_SUF:-users}"
+DEF_LDAP_GROUPS_SUF="${LDAP_GROUPS_SUF:-groups}"
+DEF_LDAP_ACCESS_FILTER_USER="${LDAP_ACCESS_FILTER_USER:-(objectClass=user)}"
+DEF_LDAP_FILTER_GROUP="${LDAP_FILTER_GROUP:-(objectClass=group)}"
 
 log "Preparing container environment ..."
 
@@ -50,12 +49,6 @@ do
     exit 1
   }
 done
-
-# setting up optionals
-[ -n "$LDAP_USER_SUF" ] && DEF_LDAP_USER_SUF="$LDAP_USER_SUF"
-[ -n "$LDAP_GROUPS_SUF" ] && DEF_LDAP_GROUPS_SUF="$LDAP_GROUPS_SUF"
-[ -n "$LDAP_ACCESS_FILTER_USER" ] && DEF_LDAP_ACCESS_FILTER_USER="$LDAP_ACCESS_FILTER_USER"
-[ -n "$LDAP_FILTER_GROUP" ] && DEF_LDAP_FILTER_GROUP="$LDAP_FILTER_GROUP"
 
 #tls
 case "$LDAP_AK_URI" in
@@ -124,7 +117,7 @@ do
     done
 
     if [ -z ${VOLPATH+x} ]; then
-        echo "${T} Required Share property 'path' is missing. Set it to somthing like that (example):"
+        log "Required share property 'path' is missing. Set it to something like that (example):"
         echo "${Selector}path: /mnt/share$ID"
         exit 1
     fi
@@ -229,7 +222,6 @@ if [ ! -z $SHARENAME ]; then
   netbios aliases = $SHARENAME
   netbios name = $SHARENAME
   additional dns hostnames = $SHARENAME
-  
 EOF
     sed -i "s/command=wsdd2/command=wsdd2 -H $SHARENAME/g" $SVC
     sed -i "s/#host-name=.*/host-name=$SHARENAME/g" $AVSMBC
@@ -256,6 +248,30 @@ if [ ! -z $GUEST_USERNAME ]; then
 EOF
 fi
 
+# debug defaults
+log "Configuring debug levels ..."
+
+SMBD_LOG_LEVEL="${SMBD_LOG_LEVEL:-1}"
+NMBD_LOG_LEVEL="${NMBD_LOG_LEVEL:-1}"
+NSLCD_DEBUG="${NSLCD_DEBUG:-false}"
+AVAHI_DEBUG="${AVAHI_DEBUG:-false}"
+WSDD2_DEBUG_LEVEL="${WSDD2_DEBUG_LEVEL:-0}"
+WSDD2_FLAGS=""
+
+i=0
+while [ "$i" -lt "$WSDD2_DEBUG_LEVEL" ]
+do
+    WSDD2_FLAGS="${WSDD2_FLAGS}W"
+    i=$((i + 1))
+done
+
+sed -i "s#command=smbd .*#command=smbd --foreground --no-process-group -d $SMBD_LOG_LEVEL --debug-stdout#g" "$SVC"
+sed -i "s#command=nmbd .*#command=nmbd -i -d $NMBD_LOG_LEVEL#g" "$SVC"
+[ "$NSLCD_DEBUG" = "true" ] && sed -i "s#command=nslcd .*#command=nslcd -d#g" "$SVC" || sed -i "s#command=nslcd .*#command=nslcd -n#g" "$SVC"
+[ "$AVAHI_DEBUG" = "true" ] && sed -i "s#command=avahi-daemon .*#command=avahi-daemon --no-drop-root --no-rlimits --debug#g" "$SVC"
+[ -n "$WSDD2_FLAGS" ] && WSDD2_FLAGS="-$WSDD2_FLAGS"
+sed -i "s#command=wsdd2.*#command=wsdd2 $WSDD2_FLAGS#g" "$SVC"
+
 # Set LDAP admin password
 smbpasswd -w $LDAP_ADMIN_DN_PASSWORD
 
@@ -264,10 +280,18 @@ cat $NSLCDC
 log "========== Final nslcd.conf end ============="
 log "========== Final samba.service (avahi) ======"
 cat $AVSMBS
-cat $AVSMBC
 log "========== Final samba.service (avahi) end =="
+log "========== Final avahi daemon ==============="
+cat $AVSMBC
+log "========== Final avahi daemon end ==========="
+log "========== Final supervisor.conf ==============="
+cat $SVC
+log "========== Final supervisor.conf end ==========="
 log "========== Final smb.conf (testparm) ========"
-testparm -s
+if ! testparm -s; then
+    log "Samba config validation failed"
+    exit 1
+fi
 log  "========= Final smb.conf (testparm) end ===="
 
 touch $INIT
