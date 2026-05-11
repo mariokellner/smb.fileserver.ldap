@@ -8,10 +8,10 @@ services:
     build: 
       context: .
       no_cache_filter: configure
-      #provenance: mode=max
-      #sbom: true
+      provenance: mode=max
+      sbom: true
       tags:
-        - git.homelab.kellner-digital.com/mario/smb.fileserver.ldap:latest # homelab gitea repo
+        - git.homelab.kellner-digital.com/public/smb.fileserver.ldap:latest # homelab gitea repo
         - smb.fileserver.ldap:latest
 
     restart: no
