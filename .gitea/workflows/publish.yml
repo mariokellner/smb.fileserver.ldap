@@ -1,5 +1,5 @@
 name: Build and push container image
-run-name: ${{ gitea.actor }} is building and pushing container image
+run-name: ${{ github.actor }} is building and pushing container image
 
 on:
   workflow_dispatch:

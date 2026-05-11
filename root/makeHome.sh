@@ -6,13 +6,9 @@ USER_INFO=$(getent passwd "$2") || exit 1
 UID=$(echo "$USER_INFO" | cut -d: -f3)
 GID=$(echo "$USER_INFO" | cut -d: -f4)
 
-HOME_DIR="$1/$2"
+if [ ! -d "$1" ] && mkdir -p "$1"
 
-if [ ! -d "$HOME_DIR" ]; then
-  mkdir -p "$HOME_DIR"
-fi
-
-chown "$UID:$GID" "$HOME_DIR"
-chmod 750 "$HOME_DIR"
+chown "$UID:$GID" "$1"
+chmod 750 "$1"
 
 exit 0
