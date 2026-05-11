@@ -280,3 +280,13 @@ Planned improvements:
 * further ci automation
 * image hardening and optimizing
 * reduced package dependecies
+
+## Debugging
+
+You can set the following ENVs do enable debug:
+
+* SMBD_LOG_LEVEL
+* NMBD_LOG_LEVEL
+* NSLCD_DEBUG
+* AVAHI_DEBUG
+* WSDD2_DEBUG_LEVEL
