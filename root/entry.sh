@@ -33,7 +33,8 @@ log "Preparing container environment ..."
 if [ -f "$INIT" ]; then
   log "Container has $INIT file"
   log "Skipping script ... "
-  exit 0
+  log "[Entrypoint] Starting CMD => $@"
+  exec "$@"
 fi
 
 # Check if variable is set
