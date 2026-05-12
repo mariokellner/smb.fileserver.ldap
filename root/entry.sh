@@ -33,7 +33,7 @@ log "Preparing container environment ..."
 if [ -f "$INIT" ]; then
   log "Container has $INIT file"
   log "Skipping script ... "
-  exit 1
+  exit 0
 fi
 
 # Check if variable is set
