@@ -19,6 +19,32 @@ log() {
     printf '[Startup] %s\n' "$1"
 }
 
+startContainer() {
+    # Todo: nslcd shows password cleartext
+    # log "========== Final nslcd.conf ================="
+    # cat $NSLCDC
+    # log "========== Final nslcd.conf end ============="
+    log "========== Final samba.service (avahi) ======"
+    cat $AVSMBS
+    log "========== Final samba.service (avahi) end =="
+    log "========== Final avahi daemon ==============="
+    cat $AVSMBC
+    log "========== Final avahi daemon end ==========="
+    log "========== Final supervisor.conf ==============="
+    cat $SVC
+    log "========== Final supervisor.conf end ==========="
+    log "========== Final smb.conf (testparm) ========"
+    if ! testparm -s; then
+        log "Samba config validation failed"
+        exit 1
+    fi
+    log  "========= Final smb.conf (testparm) end ===="
+    
+    log "[Entrypoint] Starting CMD => $@"
+    exec "$@"
+    exit 0
+}
+
 # Constants
 INIT="/.init"
 
@@ -31,11 +57,8 @@ DEF_LDAP_FILTER_GROUP="${LDAP_FILTER_GROUP:-(objectClass=group)}"
 log "Preparing container environment ..."
 
 if [ -f "$INIT" ]; then
-  log "Container has $INIT file"
-  log "Skipping script ... "
-  log "[Entrypoint] Starting CMD => $@"
-  exec "$@"
-  exit 0
+  log "Container has $INIT file (restart). Skipping script ... "
+  startContainer $@
 fi
 
 # Check if variable is set
@@ -277,26 +300,5 @@ sed -i "s#command=wsdd2.*#command=wsdd2 $WSDD2_FLAGS#g" "$SVC"
 # Set LDAP admin password
 smbpasswd -w $LDAP_ADMIN_DN_PASSWORD
 
-log "========== Final nslcd.conf ================="
-cat $NSLCDC
-log "========== Final nslcd.conf end ============="
-log "========== Final samba.service (avahi) ======"
-cat $AVSMBS
-log "========== Final samba.service (avahi) end =="
-log "========== Final avahi daemon ==============="
-cat $AVSMBC
-log "========== Final avahi daemon end ==========="
-log "========== Final supervisor.conf ==============="
-cat $SVC
-log "========== Final supervisor.conf end ==========="
-log "========== Final smb.conf (testparm) ========"
-if ! testparm -s; then
-    log "Samba config validation failed"
-    exit 1
-fi
-log  "========= Final smb.conf (testparm) end ===="
-
 touch $INIT
-
-log "[Entrypoint] Starting CMD => $@"
-exec "$@"
+startContainer $@
