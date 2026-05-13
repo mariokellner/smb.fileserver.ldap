@@ -35,6 +35,7 @@ if [ -f "$INIT" ]; then
   log "Skipping script ... "
   log "[Entrypoint] Starting CMD => $@"
   exec "$@"
+  exit 0
 fi
 
 # Check if variable is set
