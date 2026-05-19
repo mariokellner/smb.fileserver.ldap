@@ -86,6 +86,7 @@ jobs:
 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
 
           cache-from: |
             type=registry,ref=${{ env.CACHE_IMAGE }}
