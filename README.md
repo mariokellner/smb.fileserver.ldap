@@ -125,9 +125,8 @@ As this is an LDAP Container, basic LDAP infromation needs to be provided asa en
 | `LDAP_GROUPS_SUF`  | `groups` |
 | `LDAP_ACCESS_FILTER_USER` | `(objectClass=user)` |
 | `LDAP_FILTER_GROUP` | `(objectClass=group)` |
-| `LDAP_FILTER_GROUP` | `(objectClass=group)` |
 | `SHARENAME` | not set<br />when set, shorthand for assigning `netbios` and hostname to all services |
-| `GUEST_USERNAME` | not set<br />when set, shorthand for adding guest account to global smb.conf: <br />`guest account = {val}, map to guest = Bad User, guest ok = Yes` <br /> Please note: the default account is "nobody". Make sure you add a dummy account corresponding to the <br /> used guest name |
+| `GUEST_USERNAME` | not set<br />when set, shorthand for adding guest account to global smb.conf: <br />`guest account = {val}, map to guest = Bad User, guest ok = Yes` <br /> Please note: the default account is "nobody". Make sure you add a dummy account corresponding to the used guest name. |
 
 ### Global SMB Configuration
 
