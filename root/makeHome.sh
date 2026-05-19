@@ -5,7 +5,7 @@ USER_INFO=$(getent passwd "$2") || exit 1
 UID=$(echo "$USER_INFO" | cut -d: -f3)
 GID=$(echo "$USER_INFO" | cut -d: -f4)
 
-echo "Creating home directory for user $2 with UID $UID and GID $GID at $1"
+echo "Check & Try Creating home directory for user $2 with UID $UID and GID $GID at $1"
 [ ! -d "$1" ] && mkdir -p "$1"
 
 chown "$UID:$GID" "$1"

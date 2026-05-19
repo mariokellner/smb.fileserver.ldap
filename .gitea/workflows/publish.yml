@@ -55,7 +55,14 @@ jobs:
             org.opencontainers.image.authors="Mario Kellner"
             org.opencontainers.image.licenses="MIT"
             org.opencontainers.image.title="SMB Fileserver with LDAP Integration"
-            org.opencontainers.image.title="SMB Fileserver with Integration for LDAP Providers. Mainly designed for use with Authentik, but should work with any LDAP provider that supports the used schema."
+            org.opencontainers.image.description="SMB Fileserver with Integration for LDAP Providers. Mainly designed for use with Authentik, but should work with any LDAP provider that supports the used schema."
+            org.opencontainers.image.url="https://www.kellner-digital.com"
+            org.opencontainers.image.base.name="debian:trixie-slim"
+          annotations: |
+            org.opencontainers.image.authors="Mario Kellner"
+            org.opencontainers.image.licenses="MIT"
+            org.opencontainers.image.title="SMB Fileserver with LDAP Integration"
+            org.opencontainers.image.description="SMB Fileserver with Integration for LDAP Providers. Mainly designed for use with Authentik, but should work with any LDAP provider that supports the used schema."
             org.opencontainers.image.url="https://www.kellner-digital.com"
             org.opencontainers.image.base.name="debian:trixie-slim"
 
