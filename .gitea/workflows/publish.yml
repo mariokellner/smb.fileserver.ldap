@@ -7,15 +7,26 @@ on:
     tags:
       - 'v*.*.*'
 
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
 
     env:
       REGISTRY:  ${{ vars.PRIVATE_REGISTRY }}
       IMAGE_NAME: smb.fileserver.ldap
       NS: public
       IMG_PATH_GITEA: ${{ env.REGISTRY }}/${{ env.NS }}/${{ env.IMAGE_NAME }}
+      CACHE_IMAGE: ${{ vars.PRIVATE_REGISTRY }}/public/smb.fileserver.ldap:buildcache
+
 
     steps:
       - name: Checkout repository
@@ -36,13 +47,15 @@ jobs:
           
           tags: |
             type=ref,event=branch
+            type=ref,event=tag
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+            type=sha,prefix=sha-
             type=raw,value=${{ github.sha }}
           labels: |
             org.opencontainers.image.authors="Mario Kellner"
             org.opencontainers.image.licenses="MIT"
             org.opencontainers.image.title="SMB Fileserver with LDAP Integration"
+            org.opencontainers.image.title="SMB Fileserver with Integration for LDAP Providers. Mainly designed for use with Authentik, but should work with any LDAP provider that supports the used schema."
             org.opencontainers.image.url="https://www.kellner-digital.com"
             org.opencontainers.image.base.name="debian:trixie-slim"
 
@@ -66,3 +79,12 @@ jobs:
 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+          cache-from: |
+            type=registry,ref=${{ env.CACHE_IMAGE }}
+
+          cache-to: |
+            type=registry,ref=${{ env.CACHE_IMAGE }},mode=max
+
+          build-args: |
+                  BUILDKIT_INLINE_CACHE=1

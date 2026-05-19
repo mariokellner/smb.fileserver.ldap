@@ -149,7 +149,7 @@ do
 
     # I do it here because I need the path.
     if [ ! -z ${ADDPREROOTSCRIPT+x} ]; then
-        options=$(echo "$options\n\n  # this share is a homes share\n  guest ok = No\n  root preexec = /makeHome.sh $VOLPATH %U")
+        options=$(echo "$options\n\n  # this share is a homes share\n  guest ok = No\n  root preexec = /makeHome.sh $VOLPATH %u")
     fi
 
     if [ ! -z ${MAKEAVAHISERVICE+x} ]; then
@@ -202,7 +202,7 @@ log "Setup configuration files ..."
 
 # config files 
 cat <<EOF
-${T}LDAP Paramater
+LDAP Paramater:
   >> Server URL is: $LDAP_AK_URI
   >> BASEDN: $LDAP_BASE_DN
   >> ADMIN DN: $LDAP_ADMIN_DN_USERCN
