@@ -14,16 +14,16 @@ The project is developed as a personal homelab project and is not intended to co
 > [!WARNING]
 > This project is developed primarily for personal homelab usage, optimized for flexibility and LDAP experimentation and intentionally configurable and hackable
 >
-> It is **not** currently security audited, enterprise supported, intended for internet exposure, tested for large-scale multi-tenant environments. Use at your own risk.
+> It is **not** currently security audited, enterprise supported, intended for internet exposure, tested for large-scale multi-tenant environments. Use it at your own risk.
 
-## Project Goals & Tecstack
+## Project goals
 
 The primary motivation behind this project was just learning now things, as my current tecstack got a bit stale.
 I learned so much from doing this :).
 
-Further my second ggoal is to enable my netshare to authenticate against LDAP identities managed in Authentik without requiring local Unix users to be statically provisioned inside the container.
+Further my second goal is to enable my netshare to authenticate against LDAP identities managed in Authentik without requiring local unix users to be statically provisioned inside the container.
 
-Unfortunally, the LDAP provider from Authentik does not support the samba.schema. I forked and modded the LDAP provider. The code is located here: [https://github.com/mariokellner/authentik-ldap-samba-mod](https://github.com/mariokellner/authentik-ldap-samba-mod). This is far rfom perfect and a bit "hacky", but it works.
+Unfortunally, the LDAP provider from Authentik does not support the samba.schema. I forked and modded the LDAP provider. The code is located here: [https://github.com/mariokellner/authentik-ldap-samba-mod](https://github.com/mariokellner/authentik-ldap-samba-mod). This is far from perfect and a bit "hacky", but it works.
 
 ## Architecture
 
@@ -89,7 +89,7 @@ volumes:
 
 Shares can be declared declaratively through environment variables too.
 
-```yaml id="r3"
+```yaml
 SMBSHARE_ENTRY_1_name: Data
 SMBSHARE_ENTRY_1_path: /mnt/data
 SMBSHARE_ENTRY_1_read_only: no
@@ -127,7 +127,7 @@ As this is an LDAP Container, basic LDAP infromation needs to be provided asa en
 | `LDAP_FILTER_GROUP` | `(objectClass=group)` |
 | `LDAP_FILTER_GROUP` | `(objectClass=group)` |
 | `SHARENAME` | not set<br />when set, shorthand for assigning `netbios` and hostname to all services |
-| `GUEST_USERNAME` | not set<br />when set, shorthand for adding guest account to global smb.conf: <br />`guest account = {val}, map to guest = Bad User, guest ok = Yes` |
+| `GUEST_USERNAME` | not set<br />when set, shorthand for adding guest account to global smb.conf: <br />`guest account = {val}, map to guest = Bad User, guest ok = Yes` <br /> Please note: the default account is "nobody". Make sure you add a dummy account corresponding to the <br /> used guest name |
 
 ### Global SMB Configuration
 
@@ -224,7 +224,7 @@ services:
       SMBSHARE_ENTRY_1_public: yes
 
       SMBSHARE_ENTRY_2_name: User Share
-      SMBSHARE_ENTRY_2_path: /mnt/homes/%U
+      SMBSHARE_ENTRY_2_path: /mnt/homes/%u
       SMBSHARE_ENTRY_2_homes: yes
 
     volumes:
@@ -267,7 +267,7 @@ The following project served as major inspiration:
 This container packs everything into one optimized container.
 I used it over the last years with local users.
 
-The build quality is top and I would recommend this container to everyone who want to setup a smb fileserver!
+The build quality is top and I would recommend this container to everyone who want to setup a smb fileserver with docker!
 
 * container structure
 * Samba runtime handling
