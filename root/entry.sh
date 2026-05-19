@@ -20,19 +20,25 @@ log() {
 }
 
 startContainer() {
-    # Todo: nslcd shows password cleartext
-    # log "========== Final nslcd.conf ================="
-    # cat $NSLCDC
-    # log "========== Final nslcd.conf end ============="
+    log ""
+    log "Final configuration files before starting the container:"
+    log "========== Final supervisor.conf ============="
+    cat $SVC
+    log "========== Final supervisor.conf end ========="
     log "========== Final samba.service (avahi) ======"
     cat $AVSMBS
     log "========== Final samba.service (avahi) end =="
     log "========== Final avahi daemon ==============="
     cat $AVSMBC
     log "========== Final avahi daemon end ==========="
-    log "========== Final supervisor.conf ==============="
-    cat $SVC
-    log "========== Final supervisor.conf end ==========="
+    # more important things at the end because of log length limit of docker logs
+    log "========== Final nslcd.conf ================="
+    cat $NSLCDC | sed "s#bindpw .*#bindpw **********#g"
+    if ! nslcd -t; then
+        log "nslcd config validation failed"
+        exit 1
+    fi
+    log "========== Final nslcd.conf end ============="
     log "========== Final smb.conf (testparm) ========"
     if ! testparm -s; then
         log "Samba config validation failed"
@@ -240,6 +246,9 @@ filter group $DEF_LDAP_FILTER_GROUP
 
 EOF
 
+
+WSDD2_FLAGS=""
+
 # shortcut to set hostname in all services without configure provide each config separately
 if [ ! -z $SHARENAME ]; then
     cat <<EOF >> $BASEC
@@ -247,11 +256,24 @@ if [ ! -z $SHARENAME ]; then
   netbios aliases = $SHARENAME
   netbios name = $SHARENAME
   additional dns hostnames = $SHARENAME
+
 EOF
-    sed -i "s/command=wsdd2/command=wsdd2 -H $SHARENAME/g" $SVC
+    WSDD2_FLAGS="$WSDD2_FLAGS -H $SHARENAME"
     sed -i "s/#host-name=.*/host-name=$SHARENAME/g" $AVSMBC
 fi
 
+if [ ! -z $BINDINTERFACE ]; then
+    cat <<EOF >> $BASEC
+
+    interfaces = $BINDINTERFACE
+    bind interfaces only = yes
+  
+EOF
+    WSDD2_FLAGS="$WSDD2_FLAGS -i $BINDINTERFACE"
+    
+    sed -i "s/#allow-interfaces=.*/allow-interfaces=$BINDINTERFACE/g" $AVSMBC
+fi
+echo "WSDD2_FLAGS: $WSDD2_FLAGS"
 # # shortcut to set the workgroup for all services (Actually i think all services will inerhit it from the smb.cnf, but ill leave the option here)
 # if [ ! -z $WORKGROUP ]; then
 #     cat <<EOF >> $BASEC
@@ -281,11 +303,14 @@ NMBD_LOG_LEVEL="${NMBD_LOG_LEVEL:-1}"
 NSLCD_DEBUG="${NSLCD_DEBUG:-false}"
 AVAHI_DEBUG="${AVAHI_DEBUG:-false}"
 WSDD2_DEBUG_LEVEL="${WSDD2_DEBUG_LEVEL:-0}"
-WSDD2_FLAGS=""
 
 i=0
+if [ "$WSDD2_DEBUG_LEVEL" -gt 0 ]; then
+    log "WSDD2 Debug level set to $WSDD2_DEBUG_LEVEL. Setting debug flags ..."
+    WSDD2_FLAGS="$WSDD2_FLAGS-$WSDD2_DEBUG_LEVEL"
+fi
 while [ "$i" -lt "$WSDD2_DEBUG_LEVEL" ]
-do
+do 
     WSDD2_FLAGS="${WSDD2_FLAGS}W"
     i=$((i + 1))
 done
@@ -294,7 +319,7 @@ sed -i "s#command=smbd .*#command=smbd --foreground --no-process-group -d $SMBD_
 sed -i "s#command=nmbd .*#command=nmbd -i -d $NMBD_LOG_LEVEL#g" "$SVC"
 [ "$NSLCD_DEBUG" = "true" ] && sed -i "s#command=nslcd .*#command=nslcd -d#g" "$SVC" || sed -i "s#command=nslcd .*#command=nslcd -n#g" "$SVC"
 [ "$AVAHI_DEBUG" = "true" ] && sed -i "s#command=avahi-daemon .*#command=avahi-daemon --no-drop-root --no-rlimits --debug#g" "$SVC"
-[ -n "$WSDD2_FLAGS" ] && WSDD2_FLAGS="-$WSDD2_FLAGS"
+
 sed -i "s#command=wsdd2.*#command=wsdd2 $WSDD2_FLAGS#g" "$SVC"
 
 # Set LDAP admin password
